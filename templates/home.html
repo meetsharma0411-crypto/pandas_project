@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV Analysis - Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .upload-section { margin-top: 30px; padding: 20px; border: 1px dashed #ccc; width: 400px; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>બ્લોગ ટાઈટલ: {{ blog.title }}</h1>
+    <p>બ્લોગ નંબર: {{ blog.number }}</p>
+
+    <!-- CSV Upload Section -->
+    <div class="upload-section">
+        <h3>નવી CSV ફાઇલ અપલોડ કરો:</h3>
+        
+        <form action="" method="POST" enctype="multipart/form-data">
+            <!-- CSRF Token Django સિક્યોરિટી માટે જરૂરી છે -->
+            {% csrf_token %}
+            
+            <input type="file" name="csv_file" accept=".csv" required>
+            <br><br>
+            <button type="submit" class="btn">અપલોડ કરો</button>
+        </form>
+    </div>
+
+</body>
+</html>
