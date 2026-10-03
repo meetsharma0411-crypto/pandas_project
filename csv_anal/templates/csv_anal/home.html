@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Data Analysis Dashboard</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            margin: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        select,
+        input {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<h1>📊 Data Analysis Dashboard</h1>
+
+
+<!-- ========================= -->
+<!-- FILE UPLOAD -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>Upload Dataset</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <input
+            type="file"
+            name="data_file"
+            accept=".csv,.xlsx,.xls,.json"
+            required
+        >
+
+        <button type="submit">
+            Upload & Analyze
+        </button>
+
+    </form>
+
+</div>
+
+
+{% if error %}
+
+<div class="box">
+
+    <h3>Error</h3>
+
+    <p>{{ error }}</p>
+
+</div>
+
+{% endif %}
+
+
+{% if uploaded %}
+
+
+<!-- ========================= -->
+<!-- BASIC INFORMATION -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>Dataset Information</h2>
+
+    <div class="stats">
+
+        <div class="card">
+            <b>File</b>
+            <p>{{ filename }}</p>
+        </div>
+
+        <div class="card">
+            <b>Rows</b>
+            <p>{{ rows }}</p>
+        </div>
+
+        <div class="card">
+            <b>Columns</b>
+            <p>{{ columns }}</p>
+        </div>
+
+        <div class="card">
+            <b>Duplicates</b>
+            <p>{{ duplicates }}</p>
+        </div>
+
+        <div class="card">
+            <b>Missing Before</b>
+            <p>{{ missing_before }}</p>
+        </div>
+
+        <div class="card">
+            <b>Missing After</b>
+            <p>{{ missing_after }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- COLUMN TYPES -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>Column Types</h2>
+
+    <h3>Numeric Columns</h3>
+
+    <ul>
+
+        {% for column in numeric_columns %}
+
+        <li>{{ column }}</li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    <h3>Categorical Columns</h3>
+
+    <ul>
+
+        {% for column in categorical_columns %}
+
+        <li>{{ column }}</li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    <h3>DateTime Columns</h3>
+
+    <ul>
+
+        {% for column in datetime_columns %}
+
+        <li>{{ column }}</li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- STATISTICS -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>Detailed Statistics</h2>
+
+    <table>
+
+        <tr>
+
+            <th>Column</th>
+            <th>Type</th>
+            <th>Count</th>
+            <th>Unique</th>
+            <th>Mean</th>
+            <th>Median</th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Std</th>
+            <th>Mode</th>
+
+        </tr>
+
+
+        {% for column, stat in statistics.items %}
+
+        <tr>
+
+            <td>{{ column }}</td>
+
+            <td>{{ stat.type }}</td>
+
+            <td>{{ stat.count }}</td>
+
+            <td>{{ stat.unique }}</td>
+
+            <td>{{ stat.mean }}</td>
+
+            <td>{{ stat.median }}</td>
+
+            <td>{{ stat.min }}</td>
+
+            <td>{{ stat.max }}</td>
+
+            <td>{{ stat.std }}</td>
+
+            <td>{{ stat.mode }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- DATA PREVIEW -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>Data Preview</h2>
+
+    {{ preview|safe }}
+
+</div>
+
+
+<!-- ========================= -->
+<!-- VISUALIZATION -->
+<!-- ========================= -->
+
+<div class="box">
+
+    <h2>📈 Create Visualization</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <label>
+            Chart Type:
+        </label>
+
+
+        <select name="chart_type" required>
+
+            <option value="">
+                Select Chart
+            </option>
+
+            <option value="histogram">
+                Histogram
+            </option>
+
+            <option value="scatter">
+                Scatter Plot
+            </option>
+
+            <option value="line">
+                Line Chart
+            </option>
+
+            <option value="bar">
+                Bar Chart
+            </option>
+
+            <option value="box">
+                Box Plot
+            </option>
+
+            <option value="pie">
+                Pie Chart
+            </option>
+
+            <option value="heatmap">
+                Correlation Heatmap
+            </option>
+
+        </select>
+
+
+        <br>
+
+
+        <label>
+            X Axis:
+        </label>
+
+
+        <select name="x_column">
+
+            <option value="">
+                Select X Column
+            </option>
+
+            {% for column in column_names %}
+
+            <option value="{{ column }}">
+                {{ column }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <br>
+
+
+        <label>
+            Y Axis:
+        </label>
+
+
+        <select name="y_column">
+
+            <option value="">
+                Select Y Column
+            </option>
+
+            {% for column in column_names %}
+
+            <option value="{{ column }}">
+                {{ column }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <br><br>
+
+
+        <button type="submit">
+            Generate Chart
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- CHART -->
+<!-- ========================= -->
+
+{% if chart_json %}
+
+<div class="box">
+
+    <h2>Visualization</h2>
+
+    <div id="chart"></div>
+
+</div>
+
+
+{{ chart_json|json_script:"chart-data" }}
+
+
+<script>
+
+    const chartData =
+        JSON.parse(
+            document.getElementById("chart-data").textContent
+        );
+
+    Plotly.newPlot(
+        "chart",
+        chartData.data,
+        chartData.layout
+    );
+
+</script>
+
+{% endif %}
+
+
+{% endif %}
+
+
+</body>
+
+</html>
