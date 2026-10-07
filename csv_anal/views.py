@@ -1,3 +1,4 @@
+from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse
 import pandas as pd
@@ -173,7 +174,9 @@ def home(request):
             })
 
             # Save dataframe temporarily in session
-            request.session["data"] = df.to_json()
+            # NEW (Works reliably with Django sessions)
+            request.session["data"] = df.to_json(orient="split")
+            request.session.modified = True
 
         except Exception as e:
 

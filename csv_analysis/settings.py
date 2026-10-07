@@ -21,7 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-c(dgppxr#$=uj)s@9#6ral)6cn2vk##61azj+&j1r=h*xrx*tm'
-
+# Session settings for CSV analysis app
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+SESSION_COOKIE_AGE = 86400  # Session expires in 24 hours (in seconds)
+SESSION_SAVE_EVERY_REQUEST = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -117,3 +121,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# Media files (Uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
